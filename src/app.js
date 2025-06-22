@@ -6,6 +6,7 @@ const bcrypt= require("bcrypt");
 const validator=require("validator");
 const cookieParser= require("cookie-parser");
 const jwt= require("jsonwebtoken");
+const {userAuth} =require("./middlewares/auth")
 
 const express= require("express");
 const app= express();
@@ -53,7 +54,7 @@ app.post("/login",async(req,res)=>{
         const isPasswordValid= bcrypt.compare(password,user.password);
        //if password is valid i will send the token 
        if(isPasswordValid){
-        const token =  jwt.sign({_id:user._id},"HactTalk$780");
+        const token = await user.getJWT();
         res.cookie("token",token);
         res.send("Login Successful");
        }
@@ -71,26 +72,15 @@ app.post("/login",async(req,res)=>{
     }
 
 })
-app.get("/profile",async(req,res)=>{
+app.get("/profile",userAuth,async(req,res)=>{
     try{
-    const cookies= req.cookies;
-    const {token}=cookies;
-    const decodedMessage= await jwt.verify(token,"HactTalk$780");
-    const {_id}= decodedMessage;
-    const user= await User.findById(_id);
-    if(!user){
-        throw new Error("User not Found"); 
-    }
-    
+   const user= req.user;
     res.send(user);
     }
     catch(err){
          res.status(400).send("Something went wrong"+err.message);
 
     }
-
-    
-
 })
 app.get("/user",async(req,res)=>{
     const userEmail=req.body.emailId;
@@ -173,6 +163,7 @@ app.patch("/user/:userId",async(req,res)=>{
     }
 
 })
+
 
  
 

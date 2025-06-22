@@ -1,6 +1,6 @@
 const jwt =require("jsonwebtoken");
 const User = require("../models/user");
-const {userAuth} =require("./middlewares/auth");
+
 
 
 const userAuth= async (req,res,next)=>{
@@ -9,12 +9,16 @@ const userAuth= async (req,res,next)=>{
     // find the username 
     try{
     const {token}=req.cookies;
+    if(!token){
+        throw new Error("Token is not valid");
+    }
     const decodedObj= await jwt.verify(token,"HactTalk$780");
     const {_id}= decodedObj;
     const user= User.findById(_id);
     if(!user){
         throw new Error("User Not Found");
     }
+    req.user=user;
     next();
 }
 catch(err){
