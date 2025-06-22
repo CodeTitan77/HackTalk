@@ -4,12 +4,15 @@ const connectDb=require("./config/database")
 const {validateSignUpData}= require("./utils/validation")
 const bcrypt= require("bcrypt");
 const validator=require("validator");
+const cookieParser= require("cookie-parser");
+const jwt= require("jsonwebtoken");
 
 const express= require("express");
 const app= express();
 const User= require("./models/user");
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup",async (req,res)=>{
    
@@ -37,29 +40,56 @@ app.post("/signup",async (req,res)=>{
 
 });
 app.post("/login",async(req,res)=>{
-    try{
+    try{ 
         const {password,emailId}=req.body;
         if(!validator.isEmail(emailId)){
             throw new Error("Enter valid a email")
         }
         const user= await User.findOne({emailId:emailId})
+       
         if(!user){
             throw new Error("Invalid Credentials")
         }
         const isPasswordValid= bcrypt.compare(password,user.password);
-        if(isPasswordValid){
-            return res.send("Login Successful");
-        }
+       //if password is valid i will send the token 
+       if(isPasswordValid){
+        const token =  jwt.sign({_id:user._id},"HactTalk$780");
+        res.cookie("token",token);
+        res.send("Login Successful");
+       }
+
         else{
             throw new Error("Invalid Credentials");
-
         }
+       
+
 
     }
     catch(err){
          res.status(400).send("Something went wrong"+err.message);
 
     }
+
+})
+app.get("/profile",async(req,res)=>{
+    try{
+    const cookies= req.cookies;
+    const {token}=cookies;
+    const decodedMessage= await jwt.verify(token,"HactTalk$780");
+    const {_id}= decodedMessage;
+    const user= await User.findById(_id);
+    if(!user){
+        throw new Error("User not Found"); 
+    }
+    
+    res.send(user);
+    }
+    catch(err){
+         res.status(400).send("Something went wrong"+err.message);
+
+    }
+
+    
 
 })
 app.get("/user",async(req,res)=>{
