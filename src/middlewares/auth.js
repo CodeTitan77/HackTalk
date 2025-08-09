@@ -14,11 +14,13 @@ const userAuth= async (req,res,next)=>{
     }
     const decodedObj= await jwt.verify(token,"HactTalk$780");
     const {_id}= decodedObj;
-    const user= User.findById(_id);
+    const user= await User.findById(_id);
+    // console.log(user);
     if(!user){
         throw new Error("User Not Found");
     }
     req.user=user;
+    
     next();
 }
 catch(err){
