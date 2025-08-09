@@ -4,12 +4,13 @@ const { validateSignUpData } = require("../utils/validation");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 
-authRouter.get('/signup',async (req,res)=>{
+authRouter.post('/signup',async (req,res)=>{
    try{
      validateSignUpData(req);
      const {firstName,lastName,emailId,password}= req.body;
+     
      const passwordHash=await bcrypt.hash(password,10);  
-     console.log(passwordHash);
+    //  console.log(passwordHash);
  
     const user= new User({
         firstName,
@@ -17,8 +18,13 @@ authRouter.get('/signup',async (req,res)=>{
         emailId, 
         password:passwordHash
     }); 
-    await user.save();
-    res.send("User added successfully") 
+    const savedUser=await user.save();
+    const token= await savedUser.getJWT();
+    res.cookie("token",token,{
+        expires: new Date(Date.now() + 8 * 3600000),
+    })
+
+    res.json({message:"User added successfully",data:savedUser});
     } 
     catch(err){
         res.status(400).send("Error saving the user"+err.message);
@@ -29,19 +35,19 @@ authRouter.get('/signup',async (req,res)=>{
 authRouter.post("/login",async(req,res)=>{
     try{ 
         const {password,emailId}=req.body;
-        if(!validator.isEmail(emailId)){
-            throw new Error("Enter valid a email")
-        }
+       
         const user= await User.findOne({emailId:emailId})
        
         if(!user){
             throw new Error("Invalid Credentials")
         }
-        const isPasswordValid= bcrypt.compare(password,user.password);
+        const isPasswordValid= await user.validatePassword(password);
        //if password is valid i will send the token 
        if(isPasswordValid){
         const token = await user.getJWT();
-        res.cookie("token",token);
+        res.cookie("token",token,{
+            expires: new Date(Date.now()+ 8*3600000)
+        });
         res.send("Login Successful");
        }
 
