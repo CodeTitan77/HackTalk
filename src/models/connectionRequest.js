@@ -2,10 +2,12 @@ const mongoose= require('mongoose');
 const connectionRequestSchema= new mongoose.Schema({
     fromUserId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref:"User",//reference to the user collection
         required:true,
     },
     toUserId:{
         type: mongoose.Schema.Types.ObjectId,
+        ref:"User",
          required:true,
 
     },
@@ -33,7 +35,7 @@ connectionRequestSchema.pre("save",function(next){
     next();
 })//will be called before saving in db will server as 
 connectionRequestSchema.index({ fromUserId: 1,toUserId:1});
-const ConnectionRequestModel = new mongoose.model(
+const ConnectionRequest = new mongoose.model(
     "ConnectionRequest",
     connectionRequestSchema);
-    module.exports= ConnectionRequestModel;
+    module.exports= ConnectionRequest;

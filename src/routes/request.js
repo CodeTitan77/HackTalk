@@ -67,8 +67,10 @@ requestRouter.post('/request/review/:status/:requestId',userAuth,async(req,res)=
         }
        const connectionRequest=await ConnectionRequest.findOne({
          _id:requestId,
-         toUserId:loggedInUser
+         toUserId:loggedInUser._id,
+         status:"interested",
        })
+       
         
         //check if connection request is already there 
        
