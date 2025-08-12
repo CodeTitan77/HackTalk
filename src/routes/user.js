@@ -43,4 +43,26 @@ userRouter.get("/user/connections",userAuth,async(req,res)=>{
 
     }
 })
+userRouter.get("/feed",userAuth,async(req,res)=>{
+    try{
+        //already connections and //already send connections// ignored ones
+        const connectionRequests= await ConnectionRequest.find({
+            $or:[
+                {fromUserId:loggedInUser._id},
+                {toUserId:loggedInUser._id}
+            ]
+        }).select("fromUserId","toUserId");
+        const hideUsersFromFeed=new Set();
+        connectionRequests.forEach(req=>{
+            hideUsersFromFeed
+        })
+        res.send(connectionRequests);
+
+
+    }
+    catch(err){
+
+    }
+
+})
 module.exports=userRouter;
