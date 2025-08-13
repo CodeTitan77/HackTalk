@@ -1,7 +1,9 @@
 const express=require("express");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 const userRouter=express.Router();
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 //get pending connection request 
 userRouter.get("/user/requests/received",userAuth,async(req,res)=>{
     try{
@@ -45,22 +47,36 @@ userRouter.get("/user/connections",userAuth,async(req,res)=>{
 })
 userRouter.get("/feed",userAuth,async(req,res)=>{
     try{
+        //should always return at max 10 users
         //already connections and //already send connections// ignored ones
+        const loggedInUser=req.user;
+        const page=parseInt(req.query.page)|| 1;
+        let limit=parseInt(req.query.limit)||10;
+        limit= limit>50?50:limit;
+        const skip= (page-1)*limit;
         const connectionRequests= await ConnectionRequest.find({
             $or:[
                 {fromUserId:loggedInUser._id},
                 {toUserId:loggedInUser._id}
             ]
-        }).select("fromUserId","toUserId");
+        }).select("fromUserId toUserId");
+        
         const hideUsersFromFeed=new Set();
         connectionRequests.forEach(req=>{
-            hideUsersFromFeed
+            hideUsersFromFeed.add(req.fromUserId.toString());
+            hideUsersFromFeed.add(req.toUserId.toString());
+            
         })
-        res.send(connectionRequests);
+        const users= await User.find({
+           _id: {$nin: Array.from(hideUsersFromFeed)}
+        }).select(USER_SAFE_DATA).skip(skip).limit(limit)
+        // console.log(hideUsersFromFeed);
+        res.json({data:users});
 
 
     }
     catch(err){
+        res.json({"message":err.message});
 
     }
 
