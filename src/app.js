@@ -4,7 +4,8 @@ const connectDb=require("./config/database")
 const {validateSignUpData}= require("./utils/validation")
 const bcrypt= require("bcrypt");
 const validator=require("validator");
-const cookieParser= require("cookie-parser");
+const cookieParser= require("cookie-parser");//test backend
+
 const jwt= require("jsonwebtoken");
 const {userAuth} =require("./middlewares/auth")
 
