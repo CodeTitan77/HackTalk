@@ -62,7 +62,7 @@ requestRouter.post('/request/review/:status/:requestId',userAuth,async(req,res)=
         const {status,requestId}=req.params;
        
         const allowedStatus=["rejected","accepted"];
-        if(allowedStatus.includes(status)){
+        if(!allowedStatus.includes(status)){
             return res.status(400).json({message:"Invalid status type:"+status})
         }
        const connectionRequest=await ConnectionRequest.findOne({
