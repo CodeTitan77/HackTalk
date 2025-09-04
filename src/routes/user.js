@@ -31,14 +31,15 @@ userRouter.get("/user/connections",userAuth,async(req,res)=>{
 
             ]
         }).populate("fromUserId",["firstName","lastName","photoUrl","age","gender","about","skills"])
-        .populate("toUserId","fromUserId",["firstName","lastName","photoUrl","age","gender","about","skills"]);
+        .populate("toUserId",["firstName","lastName","photoUrl","age","gender","about","skills"]);
+
         const data=connectionRequests.map((row)=>{
             if(row.fromUserId._id.toString()===loggedInUser._id.toString()){
                 return row.toUserId;
             }
             return row.fromUserId;
         })
-        return res.json({data:connectionRequests});
+        return res.json({data});
 
     }
     catch(error){

@@ -56,13 +56,13 @@ requestRouter.post('/request/send/:status/:toUserId',userAuth,async(req,res)=>{
 requestRouter.post('/request/review/:status/:requestId',userAuth,async(req,res)=>{
     try{
         //check the logged in User
-        //if status is interested then only accepted 
+        //if status is interested then only accepted  but the requestStatus is accepted 
         //if ignored no change needed 
         const loggedInUser=req.user;
         const {status,requestId}=req.params;
        
         const allowedStatus=["rejected","accepted"];
-        if(!allowedStatus.includes(status)){
+        if(allowedStatus.includes(status)){
             return res.status(400).json({message:"Invalid status type:"+status})
         }
        const connectionRequest=await ConnectionRequest.findOne({
@@ -82,7 +82,7 @@ requestRouter.post('/request/review/:status/:requestId',userAuth,async(req,res)=
        
         const data= await connectionRequest.save();
         res.json({
-            message:"Connection request Sent Successfully",
+            message:"Connection request Accepted/Rejected Successfully",
             data,
         });
 
