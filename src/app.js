@@ -6,6 +6,7 @@ const bcrypt= require("bcrypt");
 const validator=require("validator");
 const cookieParser= require("cookie-parser");//test backend
 const cors=require("cors");
+require("dotenv").config();
 
 const jwt= require("jsonwebtoken");
 const {userAuth} =require("./middlewares/auth")
