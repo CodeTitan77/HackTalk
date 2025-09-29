@@ -1,6 +1,7 @@
 
 
 const connectDb=require("./config/database")
+const http=require("http");
 const {validateSignUpData}= require("./utils/validation")
 const bcrypt= require("bcrypt");
 const validator=require("validator");
@@ -24,21 +25,17 @@ const authRouter=require("./routes/auth");
 const profileRouter=require("./routes/profile");
 const requestRouter=require("./routes/request");
 const userRouter=require("./routes/user");
+const initializeSocket = require("./utils/sockets");
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/",userRouter);
+const server= http.createServer(app);
 
-
-
-
-
-
- 
-
+initializeSocket(server);
 connectDb().then(()=>{
     console.log("Database connection established")
-    app.listen(7777,()=>{ 
+    server.listen(7777,()=>{ 
     console.log("Server is successfullly listening at 7777")
 });
 
