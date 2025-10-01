@@ -8,6 +8,11 @@ const validator=require("validator");
 const cookieParser= require("cookie-parser");//test backend
 const cors=require("cors");
 require("dotenv").config();
+const authRouter=require("./routes/auth");
+const profileRouter=require("./routes/profile");
+const requestRouter=require("./routes/request");
+const userRouter=require("./routes/user");
+const initializeSocket = require("./utils/sockets");
 
 const jwt= require("jsonwebtoken");
 const {userAuth} =require("./middlewares/auth")
@@ -21,11 +26,7 @@ app.use(cors({
     }));
 app.use(express.json());
 app.use(cookieParser());
-const authRouter=require("./routes/auth");
-const profileRouter=require("./routes/profile");
-const requestRouter=require("./routes/request");
-const userRouter=require("./routes/user");
-const initializeSocket = require("./utils/sockets");
+
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
