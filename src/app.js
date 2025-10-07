@@ -20,6 +20,7 @@ const {userAuth} =require("./middlewares/auth")
 const express= require("express");
 const app= express();
 const User= require("./models/user");
+const chatRouter = require("./routes/chat");
 app.use(cors({
       origin:"http://localhost:5173",
         credentials:true,
@@ -31,6 +32,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/",userRouter);
+app.use("/",chatRouter);
 const server= http.createServer(app);
 
 initializeSocket(server);
