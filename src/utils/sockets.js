@@ -30,6 +30,7 @@ socket.on("joinChat",({firstName,userId,targetUserId})=>{
 });
 socket.on("sendMessage",async({
      firstName,
+     lastName,
         userId,
         targetUserId,
         text,
@@ -65,6 +66,7 @@ socket.on("sendMessage",async({
       
     io.to(roomId).emit("messageRecieved",{
         firstName,
+        lastName,
         text,
 
     });
