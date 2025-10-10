@@ -1,6 +1,7 @@
  const socket= require("socket.io");
  const crypto=require("crypto");
 const { Chat } = require("../models/chat");
+const ConnectionRequest = require("../models/connectionRequest");
 
 
 const getSecretRoomId=({userId,targetUserId})=>{
@@ -22,8 +23,8 @@ io.on("connection",(socket)=>{
 //Handle Events
 socket.on("joinChat",({firstName,userId,targetUserId})=>{  
       const roomId=getSecretRoomId(userId,targetUserId) ; 
-      console.log(firstName+"joined Room");
-      console.log(roomId); 
+    //   console.log(firstName+"joined Room");
+    //   console.log(roomId); 
       socket.join(roomId); 
       
 
@@ -36,11 +37,14 @@ socket.on("sendMessage",async({
         text,
 }
 )=>{  
-      const roomId=getSecretRoomId(userId,targetUserId) ; 
+      
     //  console.log(firstName +"Message. Recieved",text);
 
      //save message here
      try{
+        const roomId=getSecretRoomId(userId,targetUserId) ; 
+        // ConnectionRequest.findOne({fromUserId:userId,toUserId:targetUserId,status:"accepted"})
+        // check if user Id and targetUserId are friends.
       let chat =await  Chat.findOne({
         participants:{$all:[userId,targetUserId]},
 
