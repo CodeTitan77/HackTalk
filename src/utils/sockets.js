@@ -57,6 +57,12 @@ socket.on("sendMessage",async({
         });
        
     }
+     io.to(roomId).emit("messageRecieved",{
+        firstName,
+        lastName,
+        text,
+
+    });
      chat.messages.push({
             senderId:userId,
             text,
@@ -68,12 +74,7 @@ socket.on("sendMessage",async({
 
      }
       
-    io.to(roomId).emit("messageRecieved",{
-        firstName,
-        lastName,
-        text,
-
-    });
+   
 
 });
 socket.on("disconnect",()=>{
